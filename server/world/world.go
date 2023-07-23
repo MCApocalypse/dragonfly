@@ -2,10 +2,12 @@ package world
 
 import (
 	"errors"
-	"github.com/df-mc/goleveldb/leveldb"
+	"math"
 	"math/rand"
 	"sync"
 	"time"
+
+	"github.com/df-mc/goleveldb/leveldb"
 
 	"github.com/df-mc/atomic"
 	"github.com/df-mc/dragonfly/server/block/cube"
@@ -575,6 +577,21 @@ func (w *World) Time() int {
 	w.set.Lock()
 	defer w.set.Unlock()
 	return int(w.set.Time)
+}
+
+// Daytime returns the number of ticks since dawn
+func (w *World) Daytime() int {
+	return w.Time() % 24000
+}
+
+// Gametime returns the age of the world in ticks
+func (w *World) Gametime() int {
+	if w == nil {
+		return 0
+	}
+	w.set.Lock()
+	defer w.set.Unlock()
+	return int(w.set.CurrentTick) % math.MaxInt32
 }
 
 // SetTime sets the new time of the world. SetTime will always work, regardless of whether the time is stopped
